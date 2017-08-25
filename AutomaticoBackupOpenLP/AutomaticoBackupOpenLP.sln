@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomaticoBackupOpenLP", "AutomaticoBackupOpenLP\AutomaticoBackupOpenLP.csproj", "{28942280-DD42-407D-82F7-C76961FB47CA}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{504EDCFD-743C-47D8-B003-1258E95A3346}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,8 @@ Global
 		{28942280-DD42-407D-82F7-C76961FB47CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28942280-DD42-407D-82F7-C76961FB47CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28942280-DD42-407D-82F7-C76961FB47CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{504EDCFD-743C-47D8-B003-1258E95A3346}.Debug|Any CPU.ActiveCfg = Debug
+		{504EDCFD-743C-47D8-B003-1258E95A3346}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
