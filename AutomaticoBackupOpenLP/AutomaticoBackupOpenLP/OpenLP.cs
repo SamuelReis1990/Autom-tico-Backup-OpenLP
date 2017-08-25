@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using AutomaticoBackupOpenLP.Model;
 using System.Configuration;
+using System.ServiceProcess;
+using System.Diagnostics;
 //using System.Data.SQLite;
 
 namespace AutomaticoBackupOpenLP
 {
-    class OpenLP
+    public class OpenLP
     {
+        private string teste;
         //#region Backup Músicas
 
         //public List<RsMusicas> getDados()
