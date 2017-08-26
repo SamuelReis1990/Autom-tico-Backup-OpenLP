@@ -42,6 +42,7 @@
             this.serviceInstaller1.Description = "Realiza backups automáticamente do programa OpenLP";
             this.serviceInstaller1.DisplayName = "Backup Automático OpenLP";
             this.serviceInstaller1.ServiceName = "Backup Automático OpenLP";
+            this.serviceInstaller1.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             // 
             // ProjectInstaller
             // 

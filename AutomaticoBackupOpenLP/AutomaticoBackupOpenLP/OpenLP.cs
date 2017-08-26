@@ -1,148 +1,154 @@
-﻿using System;
+﻿using AutomaticoBackupOpenLP.Model;
+using System;
 using System.Collections.Generic;
-using AutomaticoBackupOpenLP.Model;
 using System.Configuration;
-using System.ServiceProcess;
+using System.Data.SQLite;
 using System.Diagnostics;
-//using System.Data.SQLite;
+using System.IO;
+using System.Xml;
 
 namespace AutomaticoBackupOpenLP
 {
     public class OpenLP
-    {
-        private string teste;
-        //#region Backup Músicas
+    {        
+        EventLog log = null;
 
-        //public List<RsMusicas> getDados()
-        //{
-        //    try
-        //    {
+        public OpenLP(EventLog eventLog)
+        {
+            log = eventLog;            
+        }
+        
+        #region Backup Músicas
 
-        //        string connectionString = ConfigurationManager.AppSettings["ConnectionString"];
+        public List<RsMusicas> getDados()
+        {
+            try
+            {                
+                string connectionString = ConfigurationManager.AppSettings["ConnectionString"];
 
-        //        string sqlCommand = @" SELECT s.last_modified data_musica" +
-        //                                         ", s.title nome_musica" +
-        //                                         ", s.alternate_title nome_musica_alternativa" +
-        //                                         ", a.display_name nome_autor" +
-        //                                         ", s.lyrics letra_musica" +
-        //                                     " FROM songs s" +
-        //                                         ", authors_songs ass" +
-        //                                         ", authors a" +
-        //                                    " WHERE s.id = ass.song_id" +
-        //                                      " AND a.id = ass.author_id";
+                string sqlCommand = @" SELECT s.last_modified data_musica" +
+                                                 ", s.title nome_musica" +
+                                                 ", s.alternate_title nome_musica_alternativa" +
+                                                 ", a.display_name nome_autor" +
+                                                 ", s.lyrics letra_musica" +
+                                             " FROM songs s" +
+                                                 ", authors_songs ass" +
+                                                 ", authors a" +
+                                            " WHERE s.id = ass.song_id" +
+                                              " AND a.id = ass.author_id";                
 
-        //        var rsDataReader = Util.ConexaoBase("sqlite", connectionString, sqlCommand);
+                var rsDataReader = new Conexao(log).Sqlite(connectionString, sqlCommand);
 
-        //        SQLiteDataReader rsQuery = (SQLiteDataReader)rsDataReader;
+                SQLiteDataReader rsQuery = (SQLiteDataReader)rsDataReader;
 
-        //        List<RsMusicas> musicas = new List<RsMusicas>();
+                List<RsMusicas> musicas = new List<RsMusicas>();
 
-        //        while (rsQuery.Read())
-        //        {
-        //            RsMusicas musica = new RsMusicas();
+                while (rsQuery.Read())
+                {
+                    RsMusicas musica = new RsMusicas();
 
-        //            musica.data_musica = rsQuery["data_musica"].ToString();
-        //            musica.nome_musica = rsQuery["nome_musica"].ToString();
-        //            musica.nome_musica_alternativa = rsQuery["nome_musica_alternativa"].ToString();
-        //            musica.nome_autor = rsQuery["nome_autor"].ToString();
-        //            musica.letra_musica = rsQuery["letra_musica"].ToString();
+                    musica.data_musica = rsQuery["data_musica"].ToString();
+                    musica.nome_musica = rsQuery["nome_musica"].ToString();
+                    musica.nome_musica_alternativa = rsQuery["nome_musica_alternativa"].ToString();
+                    musica.nome_autor = rsQuery["nome_autor"].ToString();
+                    musica.letra_musica = rsQuery["letra_musica"].ToString();
 
-        //            musicas.Add(musica);
-        //        }
+                    musicas.Add(musica);
+                }
 
-        //        return musicas;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Util.GeraArquivoLog(e);
-        //        throw new Exception();
-        //    }
-        //}
+                return musicas;
+            }
+            catch (Exception e)
+            {
+                log.WriteEntry(e.Message, EventLogEntryType.Error);
+                throw;
+            }
+        }
 
-        //private RetornoXml montaXml(RsMusicas musica)
-        //{
-        //    try
-        //    {
-        //        string xml = @"<?xml version='1.0' encoding='UTF-8'?>" +
-        //                        "<song xmlns='http://openlyrics.info/namespace/2009/song' version='0.8' createdIn='OpenLP 2.4.4' modifiedIn='OpenLP 2.4.4' modifiedDate='{0}'>" +
-        //                        "<properties>" +
-        //                        "<titles>" +
-        //                        "<title>{1}</title>" +
-        //                        "<title>{2}</title>" +
-        //                        "</titles>" +
-        //                        "<authors>" +
-        //                        "<author>{3}</author>" +
-        //                        "</authors>" +
-        //                        "</properties>";
+        private RetornoXml montaXml(RsMusicas musica)
+        {
+            try
+            {
+                string xml = @"<?xml version='1.0' encoding='UTF-8'?>" +
+                                "<song xmlns='http://openlyrics.info/namespace/2009/song' version='0.8' createdIn='OpenLP 2.4.4' modifiedIn='OpenLP 2.4.4' modifiedDate='{0}'>" +
+                                "<properties>" +
+                                "<titles>" +
+                                "<title>{1}</title>" +
+                                "<title>{2}</title>" +
+                                "</titles>" +
+                                "<authors>" +
+                                "<author>{3}</author>" +
+                                "</authors>" +
+                                "</properties>";
 
-        //        xml = string.Format(xml, musica.data_musica
-        //                               , musica.nome_musica
-        //                               , musica.nome_musica_alternativa
-        //                               , musica.nome_autor);
+                xml = string.Format(xml, musica.data_musica
+                                       , musica.nome_musica
+                                       , musica.nome_musica_alternativa
+                                       , musica.nome_autor);
 
-        //        XmlDocument xmlDocument = new XmlDocument();
-        //        xmlDocument.LoadXml(musica.letra_musica);
+                XmlDocument xmlDocument = new XmlDocument();
+                xmlDocument.LoadXml(musica.letra_musica);
 
-        //        foreach (XmlNode xn in xmlDocument.SelectNodes("/song/lyrics/verse"))
-        //        {
-        //            XmlAttribute name = xmlDocument.CreateAttribute("name");
+                foreach (XmlNode xn in xmlDocument.SelectNodes("/song/lyrics/verse"))
+                {
+                    XmlAttribute name = xmlDocument.CreateAttribute("name");
 
-        //            XmlElement lines = xmlDocument.CreateElement("lines");
+                    XmlElement lines = xmlDocument.CreateElement("lines");
 
-        //            name.Value = xn.Attributes["type"].Value + xn.Attributes["label"].Value;
+                    name.Value = xn.Attributes["type"].Value + xn.Attributes["label"].Value;
 
-        //            lines.InnerText = xn.InnerText;
+                    lines.InnerText = xn.InnerText;
 
-        //            xn.RemoveAll();
+                    xn.RemoveAll();
 
-        //            xn.Attributes.Append(name);
-        //            xn.AppendChild(lines);
-        //        }
+                    xn.Attributes.Append(name);
+                    xn.AppendChild(lines);
+                }
 
-        //        xml = xml + xmlDocument.DocumentElement.InnerXml + "</song>";
+                xml = xml + xmlDocument.DocumentElement.InnerXml + "</song>";
 
-        //        RetornoXml retorno = new RetornoXml();
+                RetornoXml retorno = new RetornoXml();
 
-        //        retorno.nome_musica = musica.nome_musica;
-        //        retorno.nome_autor = musica.nome_autor;
-        //        retorno.xml = xml;
+                retorno.nome_musica = musica.nome_musica;
+                retorno.nome_autor = musica.nome_autor;
+                retorno.xml = xml;
 
-        //        return retorno;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Util.GeraArquivoLog(e);
-        //        throw new Exception();
-        //    }
-        //}
+                return retorno;
+            }
+            catch (Exception e)
+            {
+                log.WriteEntry(e.Message, EventLogEntryType.Error);
+                throw;
+            }
+        }
 
-        //public void gravaMusica(RsMusicas musica)
-        //{
-        //    try
-        //    {
-        //        RetornoXml resultado = montaXml(musica);
+        public void gravaMusica(RsMusicas musica)
+        {
+            try
+            {                
+                RetornoXml resultado = montaXml(musica);
 
-        //        string nomeArquivo = resultado.nome_musica + " (" + resultado.nome_autor + ").xml";
+                string nomeArquivo = resultado.nome_musica + " (" + resultado.nome_autor + ").xml";
 
-        //        string caminho = ConfigurationManager.AppSettings["CaminhoFisico"] + @"Músicas\";
+                string caminho = ConfigurationManager.AppSettings["CaminhoFisico"] + @"Músicas\";
 
-        //        File.WriteAllText(Path.Combine(caminho, nomeArquivo), resultado.xml);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        if (e.HResult.Equals(-2147024893))
-        //        {
-        //            Directory.CreateDirectory(ConfigurationManager.AppSettings["CaminhoFisico"] + @"Músicas");
-        //            gravaMusica(musica);
-        //        }
-        //        else
-        //        {
-        //            Util.GeraArquivoLog(e);
-        //            throw new Exception();
-        //        }
-        //    }
-        //}
+                File.WriteAllText(Path.Combine(caminho, nomeArquivo), resultado.xml);
+            }
+            catch (Exception e)
+            {
+                if (e.HResult.Equals(-2147024893))
+                {
+                    Directory.CreateDirectory(ConfigurationManager.AppSettings["CaminhoFisico"] + @"Músicas");
+                    gravaMusica(musica);
+                }
+                else
+                {
+                    log.WriteEntry(e.Message, EventLogEntryType.Error);
+                    throw;
+                }
+            }
+        }
 
-        //#endregion
+        #endregion
     }
 }

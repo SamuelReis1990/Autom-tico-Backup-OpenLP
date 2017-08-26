@@ -1,25 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Configuration;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AutomaticoBackupOpenLP
 {
     static class Program
-    {
+    {        
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        static void Main()
+        static void Main(string[] args)
         {
-            ServiceBase[] ServicesToRun;
-            ServicesToRun = new ServiceBase[]
+            var debbuger = ConfigurationManager.AppSettings["debbuger"].ToString();
+
+            if (debbuger.Equals("S"))
             {
+                Service1 servico = new Service1();
+                servico.TestService(args);
+            }
+            else
+            {
+                ServiceBase[] ServicesToRun;
+                ServicesToRun = new ServiceBase[]
+                {
                 new Service1()
-            };
-            ServiceBase.Run(ServicesToRun);
+                };
+                ServiceBase.Run(ServicesToRun);
+            }           
         }
+
     }
 }
