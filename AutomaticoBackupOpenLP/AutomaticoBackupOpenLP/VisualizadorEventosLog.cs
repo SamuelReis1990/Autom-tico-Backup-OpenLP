@@ -1,20 +1,32 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace AutomaticoBackupOpenLP
 {
     public class VisualizadorEventosLog
-    {
+    {        
         public EventLog Log(string nomeLog)
         {
-            if (!EventLog.SourceExists(nomeLog))
+            try
             {
-                EventLog.CreateEventSource(nomeLog, nomeLog);
+                if (!EventLog.SourceExists(nomeLog))
+                {
+                    EventLog.CreateEventSource(nomeLog, nomeLog);
+                }
+
+                EventLog log = new EventLog();
+                log.Source = nomeLog;
+
+                return log;
             }
+            catch (Exception e)
+            {
+                EventLog log = new EventLog();
+                log.Source = nomeLog;
 
-            EventLog log = new EventLog();
-            log.Source = nomeLog;
-
-            return log;
+                log.WriteEntry(e.Message + e.StackTrace, EventLogEntryType.Error);
+                throw;
+            }
         }
     }
 }

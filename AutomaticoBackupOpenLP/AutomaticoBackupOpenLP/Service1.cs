@@ -10,14 +10,13 @@ namespace AutomaticoBackupOpenLP
 {
     public partial class Service1 : ServiceBase
     {        
-        private readonly int intervalo = Convert.ToInt32(ConfigurationManager.AppSettings["timer"].ToString());
-        VisualizadorEventosLog eventLog = new VisualizadorEventosLog();
+        private readonly int intervalo = Convert.ToInt32(ConfigurationManager.AppSettings["timer"].ToString());         
         EventLog log = null;
 
-        public Service1()
+        public Service1(EventLog eventLog)
         {
             InitializeComponent();
-            log = eventLog.Log("Backup Automático OpenLP");
+            log = eventLog;
         }
 
         #region Método utilizado para realizar debbugs
@@ -45,13 +44,13 @@ namespace AutomaticoBackupOpenLP
         {
             try
             {
-                int contador = 0;
+                int contador = 0;                
 
                 while (true)
                 {
                     if (contador != 0)
                     {
-                        Thread.Sleep(intervalo);
+                        Thread.Sleep(intervalo * 60000);
                     }
 
                     OpenLP openLp = new OpenLP(log);
@@ -68,7 +67,7 @@ namespace AutomaticoBackupOpenLP
             }
             catch (Exception e)
             {                
-                log.WriteEntry(e.Message, EventLogEntryType.Error);
+                log.WriteEntry(e.Message + e.StackTrace, EventLogEntryType.Error);
             }
         }
     }

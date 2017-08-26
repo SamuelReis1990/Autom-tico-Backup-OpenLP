@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace AutomaticoBackupOpenLP
 {
     public class Conexao
-    {        
+    {
         EventLog log = null;
 
         public Conexao(EventLog eventLog)
@@ -13,38 +13,24 @@ namespace AutomaticoBackupOpenLP
             log = eventLog;
         }
 
-        public object Sqlite(string connectionString, string sqlCommand, string dml = "select")
+        public object Sqlite(string connectionString, string sqlCommand)
         {
             try
-            {                
+            {
                 SQLiteConnection conn = new SQLiteConnection("Data Source=" + connectionString);
 
                 conn.Open();
 
                 using (var conexao = new SQLiteCommand(conn))
                 {
-                    if (dml.Equals("select"))
-                    {
-                        conexao.CommandText = sqlCommand;
-                        conexao.ExecuteNonQuery();
-                        return conexao.ExecuteReader();
-                    }
-                    else
-                    {
-                        using (var transaction = conn.BeginTransaction())
-                        {
-                            conexao.CommandText = sqlCommand;
-                            conexao.ExecuteNonQuery();
-
-                            transaction.Commit();
-                        }
-                        return "Operação realizada com sucesso.";
-                    }
-                }                
+                    conexao.CommandText = sqlCommand;
+                    conexao.ExecuteNonQuery();
+                    return conexao.ExecuteReader();
+                }
             }
             catch (Exception e)
             {
-                log.WriteEntry(e.Message, EventLogEntryType.Error);
+                log.WriteEntry(e.Message + e.StackTrace, EventLogEntryType.Error);
                 throw;
             }
         }

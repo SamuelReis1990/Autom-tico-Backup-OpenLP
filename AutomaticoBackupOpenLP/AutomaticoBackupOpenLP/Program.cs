@@ -1,4 +1,6 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
+using System.Diagnostics;
 using System.ServiceProcess;
 
 namespace AutomaticoBackupOpenLP
@@ -10,22 +12,32 @@ namespace AutomaticoBackupOpenLP
         /// </summary>
         static void Main(string[] args)
         {
-            var debbuger = ConfigurationManager.AppSettings["debbuger"].ToString();
+            VisualizadorEventosLog eventLog = new VisualizadorEventosLog();
+            var log = eventLog.Log("Backup Automático OpenLP");
 
-            if (debbuger.Equals("S"))
-            {
-                Service1 servico = new Service1();
-                servico.TestService(args);
-            }
-            else
-            {
-                ServiceBase[] ServicesToRun;
-                ServicesToRun = new ServiceBase[]
+            try
+            {              
+                var debbuger = ConfigurationManager.AppSettings["debbuger"].ToString();
+
+                if (debbuger.Equals("S"))
                 {
-                new Service1()
-                };
-                ServiceBase.Run(ServicesToRun);
-            }           
+                    Service1 servico = new Service1(log);
+                    servico.TestService(args);
+                }
+                else
+                {
+                    ServiceBase[] ServicesToRun;
+                    ServicesToRun = new ServiceBase[]
+                    {
+                new Service1(log)
+                    };
+                    ServiceBase.Run(ServicesToRun);
+                }
+            }
+            catch (Exception e)
+            {                               
+                log.WriteEntry(e.Message + e.StackTrace, EventLogEntryType.Error);
+            }      
         }
 
     }

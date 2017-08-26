@@ -60,7 +60,7 @@ namespace AutomaticoBackupOpenLP
             }
             catch (Exception e)
             {
-                log.WriteEntry(e.Message, EventLogEntryType.Error);
+                log.WriteEntry(e.Message + e.StackTrace, EventLogEntryType.Error);
                 throw;
             }
         }
@@ -117,7 +117,7 @@ namespace AutomaticoBackupOpenLP
             }
             catch (Exception e)
             {
-                log.WriteEntry(e.Message, EventLogEntryType.Error);
+                log.WriteEntry(e.Message + e.StackTrace, EventLogEntryType.Error);
                 throw;
             }
         }
@@ -143,7 +143,7 @@ namespace AutomaticoBackupOpenLP
                 }
                 else
                 {
-                    log.WriteEntry(e.Message, EventLogEntryType.Error);
+                    log.WriteEntry(e.Message + e.StackTrace, EventLogEntryType.Error);
                     throw;
                 }
             }
